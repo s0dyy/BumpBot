@@ -1,0 +1,34 @@
+{
+  "name": "ep-producer",
+  "version": "1.0.0",
+  "description": "Browse Exherbo Linux packages",
+  "main": "src/init.js",
+  "scripts": {
+    "start": "tsc && rm -rf repositories && node build/bin/ep-producer.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s0dyy/ep-producer.git"
+  },
+  "author": "Maxime Sorin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/s0dyy/ep-producer/issues"
+  },
+  "homepage": "https://github.com/s0dyy/ep-producer#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "glob": "^7.1.6",
+    "line-reader": "^0.4.0",
+    "path-parse": "^1.0.6",
+    "semver": "^7.3.4",
+    "simple-git": "^2.31.0"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.3",
+    "@types/node": "^14.14.16",
+    "@types/semver": "^7.3.4",
+    "typescript": "^4.1.3"
+  }
+}
