@@ -4,6 +4,9 @@ import semver from 'semver'
 import { once } from 'events'
 import { createReadStream } from 'fs'
 import { createInterface } from 'readline'
+import { github } from "../src/upstream/github"
+import readline from 'readline'
+import fs from 'fs'
 
 export class PackageContents {
   path: string = ""
@@ -16,10 +19,8 @@ export class PackageContents {
   versions: string|Array<string> = ""
   bestVersion: string = ""
   bestIsValid: boolean = false
-  #file!: string
-  upstream: null|string = null
-  //upstreamUrl: null|string = null 
-  //upstreamRegex: null|string = null
+  upstreamUrl: null|string = null 
+  upstreamVersion: null|string = null 
 
   constructor(packagePath: string) {
     this.path = packagePath
@@ -66,7 +67,7 @@ export class PackageContents {
           this.bestIsValid = true
         }
       }
-    // Multiple exheres.
+      // Multiple exheres.
     } else if (typeof(this.exheres) === 'object') {
       let versions = []
       let scm = false
@@ -106,35 +107,31 @@ export class PackageContents {
 
   async findSource() {
     // The file that will be used to find the source (exlib or the most recent exheres).
+    let file: string
     if (this.exlib == null) {
-      Array.isArray(this.exheres) ? this.#file = `${this.exheres[0]}` : this.#file = `${this.exheres}`
+      Array.isArray(this.exheres) ? file = `${this.exheres[0]}` : file = `${this.exheres}`
     } else {
-      this.#file = `${this.exlib}`
+      file = `${this.exlib}`
     }
 
     // TODO: Make regex more complex in the future.
-    let github = /require.*github/
-    let pecl = /require.*pecl/
+    let githubRgx = /require.*github/
+    let peclRgx = /require.*pecl/
 
-    try {
-      const rl = createInterface({
-        input: createReadStream(`${this.path}/${this.#file}`),
-      });
-      // Loop on each row and test the regex.
-      // TODO: stop readline if successful
-      rl.on('line', (line: string) => {
-        if (github.test(line)) {
-          //this.github(line)
-          this.upstream = "github"
-        } else if (pecl.test(line)) {
-          //this.pecl(line)
-          this.upstream = "pecl"
-        }
-      });
-      await once(rl, 'close');
+    const fileStream = fs.createReadStream(`${this.path}/${file}`)
+    const rl = readline.createInterface({
+      input: fileStream,
+    });
 
-    } catch (err) {
-      console.error(err);
+    for await (const line of rl) {
+      if (githubRgx.test(line)) {
+        const upstream = await github(line, this.name)
+        this.upstreamUrl = upstream[0]
+        //this.upstreamVersion = upstream[1]
+      } else if (peclRgx.test(line)) {
+        //const upstream = await pecl.upstream(line, this.name)
+        //console.log(upstream)
+      }
     }
   }
 }

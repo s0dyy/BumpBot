@@ -13,7 +13,7 @@ function logToFile(packagesPaths: any): void {
 }
 
 async function cloneRepositories() {
-  const groupsId = ['4'] 
+  const groupsId = ['3'] 
   //const groupsId = ['2','3','4']
   const weirdRepositories = ["musl"]
   fs.mkdirSync("./repositories")
@@ -45,9 +45,8 @@ async function pullRepositories() {
 
 function findPathsPackages() {
   const packagesPaths = glob.sync("repositories/*/packages/*/*", { ignore: [ 
-    // TODO: Fix exlibs folder
+    // TODO: Exlibs folder, multiple exlib, no exheres...
     "repositories/*/packages/*/exlibs",
-    // TODO: Fix packages with multiple exlib.
     "repositories/*/packages/app-office/libreoffice",
     "repositories/*/packages/kde-frameworks/kirigami",
     "repositories/*/packages/sys-libs/wayland",
@@ -58,7 +57,6 @@ function findPathsPackages() {
     "repositories/python/packages/dev-python/PyQtWebEngine",
     "repositories/python/packages/dev-python/sip",
     "repositories/virtualization/packages/app-virtualization/qemu",
-    // TODO: Fix packages wihtout exheres
     "repositories/kde/packages/kde/user-manager"
   ] })
   buildObjects(packagesPaths)
